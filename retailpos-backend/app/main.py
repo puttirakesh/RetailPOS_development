@@ -8,13 +8,16 @@ from app.core.database import check_db_connection
 from app.core.logging import get_logger, setup_logging
 from app.middleware.request_context import RequestContextMiddleware
 from app.routers import (
+    agents,
     auth,
     brands,
     categories,
     cities,
+    customers,
     groups,
     marks,
     states,
+    suppliers,
     taxes,
     uoms,
 )
@@ -59,11 +62,14 @@ app.include_router(brands.router, prefix="/api/v1")
 app.include_router(uoms.router, prefix="/api/v1")
 app.include_router(marks.router, prefix="/api/v1")
 app.include_router(taxes.router, prefix="/api/v1")
-
 app.include_router(states.router, prefix="/api/v1")
 app.include_router(cities.router, prefix="/api/v1")
 app.include_router(groups.router, prefix="/api/v1")
 app.include_router(categories.router, prefix="/api/v1")
+app.include_router(agents.router, prefix="/api/v1")
+app.include_router(suppliers.router, prefix="/api/v1")
+app.include_router(customers.router, prefix="/api/v1")
+
 
 @app.get("/health", tags=["Observability"])
 async def health() -> dict[str, str]:
