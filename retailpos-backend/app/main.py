@@ -16,6 +16,7 @@ from app.routers import (
     customers,
     groups,
     marks,
+    products,
     states,
     suppliers,
     taxes,
@@ -62,6 +63,7 @@ app.include_router(brands.router, prefix="/api/v1")
 app.include_router(uoms.router, prefix="/api/v1")
 app.include_router(marks.router, prefix="/api/v1")
 app.include_router(taxes.router, prefix="/api/v1")
+app.include_router(products.router, prefix="/api/v1")
 app.include_router(states.router, prefix="/api/v1")
 app.include_router(cities.router, prefix="/api/v1")
 app.include_router(groups.router, prefix="/api/v1")
