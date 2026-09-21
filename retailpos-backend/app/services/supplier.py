@@ -48,6 +48,7 @@ class SupplierService:
         )
         return SupplierRead.model_validate(row)
 
+        
     def update(self, supplier_id: int, payload: SupplierUpdate) -> SupplierRead:
         row = self.repo.get_by_id(supplier_id)
         if row is None:

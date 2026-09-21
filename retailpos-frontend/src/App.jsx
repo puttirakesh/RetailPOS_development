@@ -1,100 +1,54 @@
-import { useQuery } from "@tanstack/react-query";
-import { Activity, CheckCircle2, XCircle } from "lucide-react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./components/Layout";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Brands from "./pages/masters/Brands";
+import Placeholder from "./pages/Placeholder";
 
-async function fetchHealth() {
-  const res = await fetch("/health");
-  if (!res.ok) throw new Error("Health check failed");
-  return res.json();
-}
+import Products from "./pages/masters/Products";
+import Customers from "./pages/masters/Customers";
+import Categories from "./pages/masters/Categories";
+import Suppliers from "./pages/masters/Suppliers";
 
-async function fetchReady() {
-  const res = await fetch("/ready");
-  if (!res.ok) throw new Error("Ready check failed");
-  return res.json();
-}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, refetchOnWindowFocus: false },
+  },
+});
 
 export default function App() {
-  const health = useQuery({ queryKey: ["health"], queryFn: fetchHealth });
-  const ready = useQuery({ queryKey: ["ready"], queryFn: fetchReady });
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 gap-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight text-primary">
-          RetailPOS
-        </h1>
-        <p className="text-base-content/60">
-          Phase 1 skeleton — backend connectivity check
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
-        <div className="card bg-base-100 shadow-sm border border-base-300">
-          <div className="card-body">
-            <div className="flex items-center gap-3">
-              <Activity className="w-5 h-5 text-primary" />
-              <h2 className="card-title text-lg">API Liveness</h2>
-            </div>
-            {health.isLoading && (
-              <span className="loading loading-spinner loading-sm" />
-            )}
-            {health.isError && (
-              <div className="flex items-center gap-2 text-error">
-                <XCircle className="w-4 h-4" />
-                <span>Unreachable — is the backend running on :8000?</span>
-              </div>
-            )}
-            {health.data && (
-              <div className="flex items-center gap-2 text-success">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>
-                  {health.data.status} — {health.data.service}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="card bg-base-100 shadow-sm border border-base-300">
-          <div className="card-body">
-            <div className="flex items-center gap-3">
-              <Activity className="w-5 h-5 text-primary" />
-              <h2 className="card-title text-lg">Database Ready</h2>
-            </div>
-            {ready.isLoading && (
-              <span className="loading loading-spinner loading-sm" />
-            )}
-            {ready.isError && (
-              <div className="flex items-center gap-2 text-error">
-                <XCircle className="w-4 h-4" />
-                <span>Unreachable</span>
-              </div>
-            )}
-            {ready.data && (
-              <div
-                className={`flex items-center gap-2 ${
-                  ready.data.database ? "text-success" : "text-warning"
-                }`}
-              >
-                {ready.data.database ? (
-                  <CheckCircle2 className="w-4 h-4" />
-                ) : (
-                  <XCircle className="w-4 h-4" />
-                )}
-                <span>
-                  {ready.data.status}
-                  {ready.data.database === false && " (DB not reachable)"}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <p className="text-sm text-base-content/50">
-        Backend expected at{" "}
-        <code className="bg-base-300 px-1 rounded">http://localhost:8000</code>
-      </p>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/masters/brands" element={<Brands />} />
+              <Route path="/masters/products" element={<Products />} />
+              <Route path="/masters/customers" element={<Customers />} />
+              <Route path="/masters/categories" element={<Categories />} />
+              <Route path="/masters/suppliers" element={<Suppliers />} />
+              <Route
+                path="/masters/states"
+                element={<Placeholder name="Locations" />}
+              />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

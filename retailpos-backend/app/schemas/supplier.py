@@ -18,11 +18,11 @@ class SupplierCreate(BaseModel):
             raise ValueError("Supplier name is required")
         return v
 
-    @field_validator("supplier_code", "gst_no")
+    @field_validator("gst_no", mode="before")
     @classmethod
-    def upper_optional(cls, v: str | None) -> str | None:
-        if v is None or not str(v).strip():
-            return v if v is not None else None
+    def gst_default(cls, v):
+        if v is None:
+            return ""
         return str(v).strip().upper()
 
 
@@ -35,27 +35,18 @@ class SupplierUpdate(BaseModel):
     state_id: int | None = None
     gst_no: str | None = Field(default=None, max_length=20)
 
-    @field_validator("supplier_name")
-    @classmethod
-    def upper_name(cls, v: str | None) -> str | None:
-        if v is None:
-            return None
-        v = v.strip().upper()
-        if not v:
-            raise ValueError("Cannot be blank")
-        return v
-
 
 class SupplierRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
     supplier_id: int
-    supplier_code: str | None
+    supplier_code: str | None = None
     supplier_name: str
-    mobile_no: str | None
-    address: str | None
-    city_id: int | None
-    state_id: int | None
-    gst_no: str
+    mobile_no: str | None = None
+    address: str | None = None
+    city_id: int | None = None
+    state_id: int | None = None
+    gst_no: str = ""
 
 
 class SupplierListResponse(BaseModel):
